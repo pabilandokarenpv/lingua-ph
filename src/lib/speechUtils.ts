@@ -38,6 +38,25 @@ export function startSpeechRecognition(
   return recognition
 }
 
+// Get supported audio MIME type (iOS compatible)
+function getSupportedMimeType(): string {
+  const types = [
+    'audio/mp4',
+    'audio/aac', 
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/wav',
+  ]
+  
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      return type
+    }
+  }
+  return '' // Let browser choose default
+}
+
 // Record audio as blob for storage
 export async function startAudioRecording(
   onStop: (audioBlob: Blob) => void
@@ -46,20 +65,26 @@ export async function startAudioRecording(
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    const mediaRecorder = new MediaRecorder(stream)
+    
+    const mimeType = getSupportedMimeType()
+    const options: MediaRecorderOptions = mimeType ? { mimeType } : {}
+    const mediaRecorder = new MediaRecorder(stream, options)
     const audioChunks: BlobPart[] = []
 
     mediaRecorder.ondataavailable = (event) => {
-      audioChunks.push(event.data)
+      if (event.data.size > 0) {
+        audioChunks.push(event.data)
+      }
     }
 
     mediaRecorder.onstop = () => {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
+      const actualMimeType = mediaRecorder.mimeType || 'audio/mp4'
+      const audioBlob = new Blob(audioChunks, { type: actualMimeType })
       onStop(audioBlob)
       stream.getTracks().forEach(track => track.stop())
     }
 
-    mediaRecorder.start()
+    mediaRecorder.start(100) // Collect data every 100ms for better compatibility
     
     // Auto-stop after 2 minutes max
     setTimeout(() => {

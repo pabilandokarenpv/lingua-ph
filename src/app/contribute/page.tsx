@@ -228,7 +228,7 @@ function ContributePageContent() {
     setIsRecording(false)
   }
 
-  const handlePlayback = () => {
+  const handlePlayback = async () => {
     if (!audioBlob) return
     if (playbackUrlRef.current) {
       URL.revokeObjectURL(playbackUrlRef.current)
@@ -236,8 +236,19 @@ function ContributePageContent() {
     }
     const url = URL.createObjectURL(audioBlob)
     playbackUrlRef.current = url
-    const audio = new Audio(url)
-    audio.play()
+    const audio = new Audio()
+    audio.src = url
+    audio.preload = 'auto'
+    
+    // iOS requires load() before play()
+    audio.load()
+    
+    try {
+      await audio.play()
+    } catch (err) {
+      console.error('Playback failed:', err)
+    }
+    
     audio.onended = () => {
       if (playbackUrlRef.current === url) {
         URL.revokeObjectURL(url)
