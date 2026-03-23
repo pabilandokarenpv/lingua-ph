@@ -108,10 +108,20 @@ export function blobToBase64(blob: Blob): Promise<string> {
   })
 }
 
-// Play stored audio from base64
-export function playStoredAudio(base64Audio: string): void {
-  const audio = new Audio(base64Audio)
-  audio.play()
+// Play stored audio from base64 (cross-platform compatible)
+export async function playStoredAudio(base64Audio: string): Promise<void> {
+  const audio = new Audio()
+  audio.src = base64Audio
+  audio.preload = 'auto'
+  
+  // iOS requires load() before play()
+  audio.load()
+  
+  try {
+    await audio.play()
+  } catch (err) {
+    console.error('Audio playback failed:', err)
+  }
 }
 
 // Simple pronunciation similarity score (0-100)
