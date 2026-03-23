@@ -197,7 +197,7 @@ export default function CommunityPage() {
 
       <button
         onClick={() => setShowNewPost(true)}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-brand rounded-full flex items-center justify-center shadow-lg shadow-brand/20 hover:scale-105 transition-transform z-30"
+        className="fixed bottom-24 right-4 w-14 h-14 bg-brand rounded-full flex items-center justify-center shadow-md hover:scale-105 transition-transform z-30"
       >
         <Plus className="w-6 h-6 text-white" />
       </button>

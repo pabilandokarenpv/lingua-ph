@@ -425,7 +425,7 @@ function ContributePageContent() {
           onClick={() => setActiveTab('text')}
           className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 text-[12px] font-medium transition-colors ${
             activeTab === 'text'
-              ? 'bg-brand text-white shadow-lg shadow-brand/20'
+              ? 'bg-brand text-white shadow-md'
               : 'text-gray-500 dark:text-white/45 hover:text-gray-700 dark:hover:text-white/70'
           }`}
         >
@@ -439,7 +439,7 @@ function ContributePageContent() {
           onClick={() => setActiveTab('voice')}
           className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 text-[12px] font-medium transition-colors ${
             activeTab === 'voice'
-              ? 'bg-brand text-white shadow-lg shadow-brand/20'
+              ? 'bg-brand text-white shadow-md'
               : 'text-gray-500 dark:text-white/45 hover:text-gray-700 dark:hover:text-white/70'
           }`}
         >
@@ -453,7 +453,7 @@ function ContributePageContent() {
           onClick={() => setActiveTab('chat')}
           className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 text-[12px] font-medium transition-colors ${
             activeTab === 'chat'
-              ? 'bg-brand text-white shadow-lg shadow-brand/20'
+              ? 'bg-brand text-white shadow-md'
               : 'text-gray-500 dark:text-white/45 hover:text-gray-700 dark:hover:text-white/70'
           }`}
         >
@@ -903,7 +903,7 @@ function ContributePageContent() {
                         !wordDetails.translationFilipino.trim() ||
                         !wordDetails.translationEnglish.trim()
                       }
-                      className="w-full rounded-xl bg-brand py-4 text-[15px] font-semibold text-white shadow-lg shadow-brand/15 transition-opacity disabled:opacity-40"
+                      className="w-full rounded-xl bg-brand py-4 text-[15px] font-semibold text-white shadow-md transition-opacity disabled:opacity-40"
                     >
                       Publish to dictionary
                     </button>
@@ -978,7 +978,7 @@ function ContributePageContent() {
                   <button
                     type="button"
                     onClick={() => void handleChatPublish()}
-                    className="mt-5 w-full rounded-xl bg-brand py-4 text-[15px] font-semibold text-white shadow-lg shadow-brand/15"
+                    className="mt-5 w-full rounded-xl bg-brand py-4 text-[15px] font-semibold text-white shadow-md"
                   >
                     Publish word
                   </button>
@@ -1007,7 +1007,7 @@ function ContributePageContent() {
                     type="button"
                     onClick={() => void handleChatSubmit()}
                     disabled={!chatInput.trim()}
-                    className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/20 disabled:opacity-40"
+                    className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-brand text-white shadow-md disabled:opacity-40"
                     aria-label="Send message"
                   >
                     <Send className="h-5 w-5" />

@@ -307,7 +307,7 @@ export default function ProfilePage() {
             {/* Profile card */}
             <section className="mb-5 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-[#1c1c1e] p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-blue-400 text-3xl font-bold text-white shadow-lg shadow-brand/20">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-blue-400 text-3xl font-bold text-white shadow-md">
                   {profile.displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -539,7 +539,7 @@ export default function ProfilePage() {
                       onClick={() => setTheme(opt.value)}
                       className={`flex flex-1 flex-col items-center gap-2 rounded-xl py-3 text-[13px] font-medium transition-all ${
                         on
-                          ? 'bg-brand text-white shadow-lg shadow-brand/20'
+                          ? 'bg-brand text-white shadow-md'
                           : 'bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-white/60 hover:border-gray-300 dark:hover:border-white/[0.1]'
                       }`}
                     >

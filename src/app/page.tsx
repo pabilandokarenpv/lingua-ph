@@ -195,7 +195,7 @@ export default function HomePage() {
           )}
           <button
             onClick={() => setShowFloatingMenu(!showFloatingMenu)}
-            className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-xl shadow-brand/25 transition-all hover:scale-105 active:scale-95"
+            className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-lg transition-all hover:scale-105 active:scale-95"
             aria-label="Actions menu"
           >
             <MoreHorizontal className="h-6 w-6" />

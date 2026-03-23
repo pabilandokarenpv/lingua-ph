@@ -228,7 +228,7 @@ export function SwadeshMode({
               className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
                 isRecording
                   ? 'bg-red-500 shadow-lg shadow-red-500/30'
-                  : 'bg-brand shadow-lg shadow-brand/30'
+                  : 'bg-brand shadow-md'
               }`}
             >
               {isRecording ? (

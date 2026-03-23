@@ -335,7 +335,7 @@ export default function LearnPage() {
                 {on && (
                   <motion.span
                     layoutId="learn-tab-pill"
-                    className="absolute inset-0 rounded-xl bg-brand shadow-lg shadow-brand/20"
+                    className="absolute inset-0 rounded-xl bg-brand shadow-md"
                     transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                   />
                 )}
@@ -450,7 +450,7 @@ export default function LearnPage() {
                     whileTap={{ scale: 0.96 }}
                     onClick={() => void handleSendMessage()}
                     disabled={!input.trim() || !selectedLanguage || isLoading}
-                    className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/20 transition-opacity disabled:opacity-40"
+                    className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-brand text-white shadow-md transition-opacity disabled:opacity-40"
                     aria-label="Send message"
                   >
                     <Send className="h-5 w-5" strokeWidth={2} />
@@ -490,7 +490,7 @@ export default function LearnPage() {
                   <button
                     type="button"
                     onClick={handleStartOverFlashcards}
-                    className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-brand/20"
+                    className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-[15px] font-semibold text-white shadow-md"
                   >
                     <RotateCcw className="h-4 w-4" strokeWidth={2} />
                     Start over

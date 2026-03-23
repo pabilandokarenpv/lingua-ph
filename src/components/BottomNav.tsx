@@ -27,7 +27,7 @@ export function BottomNav() {
               if (item.isCenter) {
                 return (
                   <Link key={item.href} href={item.href} className="relative -mt-6">
-                    <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 bg-brand shadow-brand/30">
+                    <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 bg-brand">
                       <item.icon className="w-5 h-5 text-white" strokeWidth={2.5} />
                     </div>
                   </Link>

@@ -306,7 +306,7 @@ export default function DictionaryLangPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium transition-all ${
                   selected
-                    ? 'bg-brand text-white shadow-lg shadow-brand/20'
+                    ? 'bg-brand text-white shadow-md'
                     : 'border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-[#1c1c1e] text-gray-500 dark:text-white/50 hover:border-gray-300 dark:hover:border-white/[0.1] hover:text-gray-700 dark:hover:text-white/80'
                 }`}
               >
@@ -492,7 +492,7 @@ export default function DictionaryLangPage() {
               {posts.length > 0 && (
                 <button
                   onClick={() => setShowPostModal(true)}
-                  className="fixed bottom-28 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-xl shadow-brand/25 transition-all hover:scale-105 active:scale-95"
+                  className="fixed bottom-28 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-lg transition-all hover:scale-105 active:scale-95"
                   aria-label="Write a post"
                 >
                   <PenLine className="h-6 w-6" />
@@ -569,7 +569,7 @@ export default function DictionaryLangPage() {
                   setShowPostModal(false)
                 }}
                 disabled={!newPostContent.trim() || isPostingCommunity}
-                className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand/15 disabled:opacity-40 transition-opacity"
+                className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-semibold text-white shadow-md disabled:opacity-40 transition-opacity"
               >
                 {isPostingCommunity ? (
                   <motion.div

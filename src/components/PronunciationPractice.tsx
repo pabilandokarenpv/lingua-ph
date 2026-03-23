@@ -142,7 +142,7 @@ export function PronunciationPractice({
 
                     <button
                       onClick={handleStartPractice}
-                      className="w-full py-3 px-4 rounded-xl bg-brand hover:opacity-90 text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-brand/15"
+                      className="w-full py-3 px-4 rounded-xl bg-brand hover:opacity-90 text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-md"
                     >
                       <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                         <Mic className="w-4 h-4" />
