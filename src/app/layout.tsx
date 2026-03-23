@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <OfflineBanner />
-          <main className="max-w-[430px] mx-auto pb-28" style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
+          <main className="max-w-[430px] mx-auto" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 8px))' }}>
             {children}
           </main>
           <BottomNav />
