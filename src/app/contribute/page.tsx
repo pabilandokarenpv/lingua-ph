@@ -17,6 +17,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { RecordButton } from '@/components/RecordButton'
+import { NotificationBell } from '@/components/NotificationBell'
 import { getAllLanguages, saveWord, getProfile, saveProfile } from '@/lib/db'
 import { startAudioRecording, startSpeechRecognition, blobToBase64 } from '@/lib/speechUtils'
 import type { Language, WordEntry, UserProfile } from '@/types'
@@ -412,9 +413,12 @@ function ContributePageContent() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <div className="flex items-center gap-3 mb-2">
-          <img src="/logo.png" alt="Lingua PH" className="w-10 h-10 rounded-xl" />
-          <h1 className="text-[28px] font-semibold tracking-tight text-gray-900 dark:text-white">Contribute</h1>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Lingua PH" className="w-10 h-10 rounded-xl" />
+            <h1 className="text-[28px] font-semibold tracking-tight text-gray-900 dark:text-white">Contribute</h1>
+          </div>
+          <NotificationBell />
         </div>
         <p className="text-[14px] leading-relaxed text-gray-500 dark:text-white/40">
           Add a word by text, voice, chat, or extract from video.

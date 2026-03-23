@@ -22,9 +22,10 @@ import {
   getProfile,
   saveProfile,
 } from '@/lib/db'
-import { chatWithOllama } from '@/lib/ollama'
+import { hybridChat } from '@/lib/offlineAI'
 import { speakWord } from '@/lib/speechUtils'
 import { ChatBubble } from '@/components/ChatBubble'
+import { NotificationBell } from '@/components/NotificationBell'
 import type { Language, WordEntry, ChatMessage, UserProfile } from '@/types'
 
 const quickPrompts = [
@@ -182,13 +183,8 @@ export default function LearnPage() {
       return
     }
 
-    const historyForModel = [...messages, userMessage].map((m) => ({
-      role: m.role,
-      content: m.content,
-    }))
-
     try {
-      const response = await chatWithOllama(historyForModel, buildVocabPayload())
+      const { response, isOffline: offline } = await hybridChat(input, selectedLanguage)
       const assistantMessage: ChatMessage = {
         id: `${Date.now() + 1}`,
         role: 'assistant',
@@ -197,19 +193,14 @@ export default function LearnPage() {
       }
       setMessages((prev) => [...prev, assistantMessage])
       await saveChatMessage(selectedLanguage, assistantMessage)
-
-      const offlineHint =
-        response.includes('offline mode') ||
-        response.includes("I'm currently in offline mode") ||
-        response.includes('limited vocabulary')
-      setIsOffline(offlineHint)
+      setIsOffline(offline)
     } catch {
       setIsOffline(true)
       const fallbackMessage: ChatMessage = {
         id: `${Date.now() + 1}`,
         role: 'assistant',
         content:
-          "I'm in offline mode. Browse the dictionary for documented words, or try again when the assistant is available.",
+          "I'm having trouble responding right now. Try browsing the dictionary directly, or ask a simpler question like 'What is water in [language]?'",
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, fallbackMessage])
@@ -285,9 +276,12 @@ export default function LearnPage() {
         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
         className="shrink-0 space-y-4 mb-4"
       >
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Lingua PH" className="w-10 h-10 rounded-xl" />
-          <h1 className="text-[28px] font-semibold tracking-tight text-gray-900 dark:text-white">Learn</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Lingua PH" className="w-10 h-10 rounded-xl" />
+            <h1 className="text-[28px] font-semibold tracking-tight text-gray-900 dark:text-white">Learn</h1>
+          </div>
+          <NotificationBell />
         </div>
 
         <div className="relative">

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Clock, ChevronDown, User, Volume2, Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { speakWord } from '@/lib/speechUtils'
+import { archiveStory, unarchiveStory, isStoryArchived } from '@/lib/db'
 import type { Story } from '@/types'
 
 interface StoryCardProps {
@@ -24,6 +25,10 @@ export function StoryCard({ story, index = 0 }: StoryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [showTranslation, setShowTranslation] = useState(false)
+
+  useEffect(() => {
+    isStoryArchived(story.id).then(setIsBookmarked)
+  }, [story.id])
 
   const handleListen = () => {
     if (story.audioBlob) {
@@ -95,11 +100,20 @@ export function StoryCard({ story, index = 0 }: StoryCardProps) {
               <ChevronDown className={cn('w-4 h-4 transition-transform', isExpanded && 'rotate-180')} />
             </button>
             <button
-              onClick={() => setIsBookmarked(!isBookmarked)}
+              onClick={async () => {
+                if (isBookmarked) {
+                  await unarchiveStory(story.id)
+                  setIsBookmarked(false)
+                } else {
+                  await archiveStory(story)
+                  setIsBookmarked(true)
+                }
+              }}
               className={cn(
                 'p-2.5 rounded-xl transition-all duration-300',
                 isBookmarked ? 'bg-orange-500/10 text-orange-500' : 'bg-gray-100 dark:bg-white/5 text-gray-400 dark:text-white/40 hover:text-gray-600 dark:hover:text-white/70'
               )}
+              title={isBookmarked ? 'Remove from archive' : 'Save to archive'}
             >
               <Bookmark className={cn('w-4 h-4', isBookmarked && 'fill-current')} />
             </button>

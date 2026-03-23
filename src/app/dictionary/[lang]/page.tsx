@@ -23,6 +23,7 @@ import { StoryCard } from '@/components/StoryCard'
 import { PronunciationPractice } from '@/components/PronunciationPractice'
 import { AIProgressCard } from '@/components/AIProgressCard'
 import { SwadeshMode } from '@/components/SwadeshMode'
+import { NotificationBell } from '@/components/NotificationBell'
 import {
   getLanguage,
   getAllLanguages,
@@ -32,6 +33,9 @@ import {
   saveCommunityPost,
   confirmWord,
   flagWord,
+  hasUserInteracted,
+  saveUserInteraction,
+  addNotification,
 } from '@/lib/db'
 import { speakWord } from '@/lib/speechUtils'
 import type { Language, WordEntry, Story, CommunityPost } from '@/types'
@@ -139,13 +143,49 @@ export default function DictionaryLangPage() {
   }
 
   const handleConfirm = async (wordId: string) => {
+    const { hasInteracted, action } = await hasUserInteracted(wordId)
+    if (hasInteracted) {
+      alert(action === 'confirm' ? 'You have already confirmed this word.' : 'You have already flagged this word.')
+      return
+    }
     await confirmWord(wordId)
-    setWords(await getWordsByLanguage(langId))
+    await saveUserInteraction(wordId, 'confirm')
+    
+    const updatedWords = await getWordsByLanguage(langId)
+    setWords(updatedWords)
+    
+    const word = updatedWords.find(w => w.id === wordId)
+    if (word && word.publishedBy) {
+      await addNotification({
+        type: 'translation_confirmed',
+        title: 'Translation Confirmed',
+        body: `Someone confirmed your translation for "${word.word}" is accurate.`,
+        data: { wordId, word: word.word }
+      })
+    }
   }
 
   const handleFlag = async (wordId: string) => {
+    const { hasInteracted, action } = await hasUserInteracted(wordId)
+    if (hasInteracted) {
+      alert(action === 'flag' ? 'You have already flagged this word.' : 'You have already confirmed this word.')
+      return
+    }
     await flagWord(wordId)
-    setWords(await getWordsByLanguage(langId))
+    await saveUserInteraction(wordId, 'flag')
+    
+    const updatedWords = await getWordsByLanguage(langId)
+    setWords(updatedWords)
+    
+    const word = updatedWords.find(w => w.id === wordId)
+    if (word && word.flagCount > word.confirmedCount && word.publishedBy) {
+      await addNotification({
+        type: 'content_archived',
+        title: 'Content Moved to Drafts',
+        body: `Your contribution "${word.word}" has been moved to drafts for review. You can edit and resubmit.`,
+        data: { wordId, word: word.word }
+      })
+    }
   }
 
   const handleCommunityPost = async () => {
@@ -238,7 +278,7 @@ export default function DictionaryLangPage() {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="min-w-0 flex-1">
-              <div className="relative">
+              <div className="relative flex items-center gap-2">
                 <select
                   value={langId}
                   onChange={(e) => handleLanguageChange(e.target.value)}
@@ -256,6 +296,7 @@ export default function DictionaryLangPage() {
                     </option>
                   ))}
                 </select>
+                <NotificationBell />
               </div>
               <div className="mt-2 flex items-center gap-2">
                 <p className="text-sm text-gray-500 dark:text-white/50">

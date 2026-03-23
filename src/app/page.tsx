@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Search, Plus, TrendingUp, Users, BookOpen, MapPin, ChevronRight, MoreHorizontal, Heart, Activity } from 'lucide-react'
 import Link from 'next/link'
 import { initializeDatabase, getAllLanguages, saveLanguage } from '@/lib/db'
+import { NotificationBell } from '@/components/NotificationBell'
 import type { Language } from '@/types'
 
 const filters = ['All', 'Luzon', 'Visayas', 'Mindanao', 'Critical', 'Active']
@@ -71,11 +72,16 @@ export default function HomePage() {
     <div className="px-5 pt-6 pb-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
-        <div className="flex items-center gap-2.5 mb-1">
-          <img src="/logo.png" alt="Lingua PH" className="w-9 h-9 rounded-xl" />
-          <h1 className="text-[24px] font-bold tracking-tight text-gray-900 dark:text-white">Lingua PH</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="Lingua PH" className="w-9 h-9 rounded-xl" />
+            <div>
+              <h1 className="text-[24px] font-bold tracking-tight text-gray-900 dark:text-white">Lingua PH</h1>
+              <p className="text-gray-500 dark:text-white/40 text-[13px]">Preserve indigenous languages</p>
+            </div>
+          </div>
+          <NotificationBell />
         </div>
-        <p className="text-gray-500 dark:text-white/40 text-[13px] ml-[46px]">Preserve indigenous languages</p>
       </motion.div>
 
       {/* Stats */}

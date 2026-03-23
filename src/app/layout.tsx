@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme'
+import { AuthProvider } from '@/lib/auth'
 import { OfflineBanner } from '@/components/OfflineBanner'
 import { BottomNav } from '@/components/BottomNav'
 import { VoicePreloader } from '@/components/VoicePreloader'
@@ -34,12 +35,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider>
-          <VoicePreloader />
-          <OfflineBanner />
-          <main className="max-w-[430px] mx-auto pb-20">
-            {children}
-          </main>
-          <BottomNav />
+          <AuthProvider>
+            <VoicePreloader />
+            <OfflineBanner />
+            <main className="max-w-[430px] mx-auto pb-20">
+              {children}
+            </main>
+            <BottomNav />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

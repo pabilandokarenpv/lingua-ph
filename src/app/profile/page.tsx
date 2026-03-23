@@ -25,9 +25,23 @@ import {
   ExternalLink,
   ChevronRight,
   AlertTriangle,
+  BookMarked,
+  FileCheck,
+  FileClock,
+  LogOut,
 } from 'lucide-react'
-import { getProfile, saveProfile, getAllLanguages, getWordsByLanguage } from '@/lib/db'
+import { 
+  getProfile, 
+  saveProfile, 
+  getAllLanguages, 
+  getWordsByLanguage,
+  getUserContributions,
+  getArchivedStories,
+  type UserContribution,
+} from '@/lib/db'
 import { useTheme } from '@/lib/theme'
+import { useAuth } from '@/lib/auth'
+import { ArchiveModal } from '@/components/ArchiveModal'
 import type { UserProfile, Language, WordEntry } from '@/types'
 
 const TABS = [
@@ -177,14 +191,28 @@ export default function ProfilePage() {
   const [isDiaspora, setIsDiaspora] = useState(false)
   const [diasporaRegion, setDiasporaRegion] = useState('')
   const [diasporaLanguage, setDiasporaLanguage] = useState('')
+  const [showArchiveModal, setShowArchiveModal] = useState(false)
+  const [archiveCount, setArchiveCount] = useState(0)
+  const [contributions, setContributions] = useState<UserContribution[]>([])
+  const [contributionTab, setContributionTab] = useState<'published' | 'drafts'>('published')
+
+  const { user, logout } = useAuth()
 
   const loadData = useCallback(async () => {
-    const [userProfile, allLanguages] = await Promise.all([getProfile(), getAllLanguages()])
+    const [userProfile, allLanguages, archived, userContributions] = await Promise.all([
+      getProfile(), 
+      getAllLanguages(),
+      getArchivedStories(),
+      getUserContributions(),
+    ])
+
+    setArchiveCount(archived.length)
+    setContributions(userContributions)
 
     if (!userProfile) {
       setContributorWords([])
       const defaultProfile: UserProfile = {
-        displayName: 'Guest User',
+        displayName: user?.name || 'Guest User',
         phoneNumber: '',
         languagesContributing: [],
         languagesLearning: [],
@@ -209,7 +237,7 @@ export default function ProfilePage() {
     }
 
     setLanguages(allLanguages)
-  }, [])
+  }, [user?.name])
 
   useEffect(() => {
     loadData()
@@ -508,6 +536,113 @@ export default function ProfilePage() {
                 })}
               </div>
             </section>
+
+            {/* My Contributions */}
+            <section className="mb-6">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-white/40">
+                My Contributions
+              </h3>
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setContributionTab('published')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition-all ${
+                    contributionTab === 'published'
+                      ? 'bg-brand text-white'
+                      : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-white/60'
+                  }`}
+                >
+                  <FileCheck className="w-4 h-4" />
+                  Published
+                </button>
+                <button
+                  onClick={() => setContributionTab('drafts')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition-all ${
+                    contributionTab === 'drafts'
+                      ? 'bg-brand text-white'
+                      : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-white/60'
+                  }`}
+                >
+                  <FileClock className="w-4 h-4" />
+                  Drafts
+                </button>
+              </div>
+              
+              {contributions.filter(c => 
+                contributionTab === 'published' 
+                  ? c.status === 'published' 
+                  : c.status === 'draft' || c.status === 'archived'
+              ).length === 0 ? (
+                <div className="text-center py-8 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-[#1c1c1e]">
+                  {contributionTab === 'published' ? (
+                    <>
+                      <FileCheck className="w-10 h-10 mx-auto text-gray-300 dark:text-white/20 mb-2" />
+                      <p className="text-sm text-gray-500 dark:text-white/50">No published contributions yet</p>
+                      <p className="text-xs text-gray-400 dark:text-white/30 mt-1">Start contributing to see your work here</p>
+                    </>
+                  ) : (
+                    <>
+                      <FileClock className="w-10 h-10 mx-auto text-gray-300 dark:text-white/20 mb-2" />
+                      <p className="text-sm text-gray-500 dark:text-white/50">No drafts</p>
+                      <p className="text-xs text-gray-400 dark:text-white/30 mt-1">Flagged content will appear here for editing</p>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {contributions
+                    .filter(c => 
+                      contributionTab === 'published' 
+                        ? c.status === 'published' 
+                        : c.status === 'draft' || c.status === 'archived'
+                    )
+                    .map((contrib) => (
+                      <div
+                        key={contrib.id}
+                        className="flex items-center justify-between p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-[#1c1c1e]"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                            {contrib.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-gray-500 dark:text-white/40">
+                              {contrib.type === 'word' ? 'Word' : 'Story'}
+                            </span>
+                            {contrib.status === 'published' && (
+                              <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                                <BadgeCheck className="w-3 h-3" />
+                                {contrib.confirmCount} confirms
+                              </span>
+                            )}
+                            {contrib.status === 'archived' && (
+                              <span className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                                <AlertTriangle className="w-3 h-3" />
+                                Needs review
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {(contrib.status === 'draft' || contrib.status === 'archived') && (
+                          <button className="text-xs text-brand font-medium hover:underline">
+                            Edit
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </section>
+
+            {/* Log out */}
+            <section className="mb-6">
+              <button
+                onClick={logout}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-medium transition-colors hover:bg-red-100 dark:hover:bg-red-500/20"
+              >
+                <LogOut className="w-4 h-4" />
+                Log out
+              </button>
+            </section>
           </motion.div>
         )}
 
@@ -570,13 +705,27 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => setNotifications(!notifications)}
-                  className={`relative h-[30px] w-[50px] rounded-full transition-colors ${notifications ? 'bg-brand' : 'bg-gray-300 dark:bg-white/20'}`}
+                  className={`relative h-[28px] w-[48px] rounded-full transition-colors ${notifications ? 'bg-brand' : 'bg-gray-300 dark:bg-white/20'}`}
                 >
                   <motion.span
-                    className="absolute top-[3px] left-[3px] h-[24px] w-[24px] rounded-full bg-white shadow-sm"
+                    className="absolute top-[3px] left-[3px] h-[22px] w-[22px] rounded-full bg-white shadow-sm"
                     animate={{ x: notifications ? 20 : 0 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
+                </button>
+              </SettingsRow>
+            </section>
+
+            {/* My Archive */}
+            <section className="rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-[#1c1c1e] px-5 divide-y divide-gray-200 dark:divide-white/[0.06]">
+              <SettingsRow icon={BookMarked} label="My Archive">
+                <button
+                  type="button"
+                  onClick={() => setShowArchiveModal(true)}
+                  className="flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-white/10 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-white/70 transition-colors hover:bg-gray-200 dark:hover:bg-white/15"
+                >
+                  {archiveCount} saved
+                  <ChevronRight className="w-3 h-3" />
                 </button>
               </SettingsRow>
             </section>
@@ -1292,6 +1441,12 @@ export default function ProfilePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Archive Modal */}
+      <ArchiveModal 
+        isOpen={showArchiveModal} 
+        onClose={() => setShowArchiveModal(false)} 
+      />
     </div>
   )
 }

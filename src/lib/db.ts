@@ -9,6 +9,9 @@ const storyStore = localforage.createInstance({ name: 'lingua-stories' })
 const profileStore = localforage.createInstance({ name: 'lingua-profile' })
 const chatStore = localforage.createInstance({ name: 'lingua-chat' })
 const communityStore = localforage.createInstance({ name: 'lingua-community' })
+const archiveStore = localforage.createInstance({ name: 'lingua-archive' })
+const contributionStore = localforage.createInstance({ name: 'lingua-contributions' })
+const notificationStore = localforage.createInstance({ name: 'lingua-notifications' })
 
 // Database version - increment this to force re-seed
 const DB_VERSION = 2
@@ -160,4 +163,187 @@ export async function getCommunityPosts(languageId: string): Promise<CommunityPo
 
 export async function saveCommunityPost(post: CommunityPost): Promise<void> {
   await communityStore.setItem(post.id, post)
+}
+
+// Archive (Saved Stories)
+export interface ArchivedStory {
+  id: string
+  storyId: string
+  languageId: string
+  title: string
+  savedAt: string
+}
+
+export async function getArchivedStories(): Promise<ArchivedStory[]> {
+  const archived: ArchivedStory[] = []
+  await archiveStore.iterate<ArchivedStory, void>((value) => {
+    archived.push(value)
+  })
+  return archived.sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime())
+}
+
+export async function archiveStory(story: Story): Promise<void> {
+  const archived: ArchivedStory = {
+    id: `archive-${story.id}`,
+    storyId: story.id,
+    languageId: story.languageId,
+    title: story.title,
+    savedAt: new Date().toISOString(),
+  }
+  await archiveStore.setItem(archived.id, archived)
+}
+
+export async function unarchiveStory(storyId: string): Promise<void> {
+  await archiveStore.removeItem(`archive-${storyId}`)
+}
+
+export async function isStoryArchived(storyId: string): Promise<boolean> {
+  const item = await archiveStore.getItem(`archive-${storyId}`)
+  return !!item
+}
+
+// User Contributions
+export interface UserContribution {
+  id: string
+  type: 'word' | 'story'
+  itemId: string
+  languageId: string
+  title: string
+  status: 'published' | 'draft' | 'archived'
+  confirmCount: number
+  flagCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+export async function getUserContributions(): Promise<UserContribution[]> {
+  const contributions: UserContribution[] = []
+  await contributionStore.iterate<UserContribution, void>((value) => {
+    contributions.push(value)
+  })
+  return contributions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+}
+
+export async function saveUserContribution(contribution: UserContribution): Promise<void> {
+  await contributionStore.setItem(contribution.id, contribution)
+}
+
+export async function updateContributionStatus(
+  contributionId: string, 
+  status: 'published' | 'draft' | 'archived'
+): Promise<void> {
+  const contribution = await contributionStore.getItem<UserContribution>(contributionId)
+  if (contribution) {
+    contribution.status = status
+    contribution.updatedAt = new Date().toISOString()
+    await contributionStore.setItem(contributionId, contribution)
+  }
+}
+
+// User interactions tracking (for confirm/flag once per word)
+export interface UserInteraction {
+  wordId: string
+  action: 'confirm' | 'flag'
+  timestamp: string
+}
+
+export async function getUserInteractions(): Promise<Record<string, UserInteraction>> {
+  const interactions = await profileStore.getItem<Record<string, UserInteraction>>('user_interactions')
+  return interactions || {}
+}
+
+export async function saveUserInteraction(wordId: string, action: 'confirm' | 'flag'): Promise<void> {
+  const interactions = await getUserInteractions()
+  interactions[wordId] = { wordId, action, timestamp: new Date().toISOString() }
+  await profileStore.setItem('user_interactions', interactions)
+}
+
+export async function hasUserInteracted(wordId: string): Promise<{ hasInteracted: boolean; action?: 'confirm' | 'flag' }> {
+  const interactions = await getUserInteractions()
+  const interaction = interactions[wordId]
+  return { hasInteracted: !!interaction, action: interaction?.action }
+}
+
+// Notifications
+export interface AppNotification {
+  id: string
+  type: 'translation_confirmed' | 'story_saved' | 'content_archived' | 'milestone_reached' | 'system'
+  title: string
+  body: string
+  read: boolean
+  createdAt: string
+  data?: Record<string, string>
+}
+
+export async function getNotifications(): Promise<AppNotification[]> {
+  const notifications: AppNotification[] = []
+  await notificationStore.iterate<AppNotification, void>((value) => {
+    notifications.push(value)
+  })
+  return notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+}
+
+export async function addNotification(notification: Omit<AppNotification, 'id' | 'read' | 'createdAt'>): Promise<void> {
+  const newNotification: AppNotification = {
+    ...notification,
+    id: `notif-${Date.now()}`,
+    read: false,
+    createdAt: new Date().toISOString(),
+  }
+  await notificationStore.setItem(newNotification.id, newNotification)
+}
+
+export async function markNotificationRead(notificationId: string): Promise<void> {
+  const notification = await notificationStore.getItem<AppNotification>(notificationId)
+  if (notification) {
+    notification.read = true
+    await notificationStore.setItem(notificationId, notification)
+  }
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  await notificationStore.iterate<AppNotification, void>(async (value, key) => {
+    if (!value.read) {
+      value.read = true
+      await notificationStore.setItem(key, value)
+    }
+  })
+}
+
+export async function getUnreadNotificationCount(): Promise<number> {
+  let count = 0
+  await notificationStore.iterate<AppNotification, void>((value) => {
+    if (!value.read) count++
+  })
+  return count
+}
+
+export async function clearAllNotifications(): Promise<void> {
+  await notificationStore.clear()
+}
+
+// Notification Settings
+export interface NotificationSettings {
+  translationConfirmed: boolean
+  storySaved: boolean
+  contentArchived: boolean
+  milestoneReached: boolean
+  systemUpdates: boolean
+}
+
+const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+  translationConfirmed: true,
+  storySaved: true,
+  contentArchived: true,
+  milestoneReached: true,
+  systemUpdates: true,
+}
+
+export async function getNotificationSettings(): Promise<NotificationSettings> {
+  const settings = await profileStore.getItem<NotificationSettings>('notification_settings')
+  return settings || DEFAULT_NOTIFICATION_SETTINGS
+}
+
+export async function saveNotificationSettings(settings: NotificationSettings): Promise<void> {
+  await profileStore.setItem('notification_settings', settings)
 }

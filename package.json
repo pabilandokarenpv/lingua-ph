@@ -17,6 +17,7 @@
     "clsx": "^2.1.1",
     "compromise": "^14.15.0",
     "framer-motion": "^12.38.0",
+    "fuse.js": "^7.1.0",
     "idb": "^8.0.3",
     "localforage": "^1.10.0",
     "lucide-react": "^0.577.0",
