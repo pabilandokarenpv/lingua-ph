@@ -429,7 +429,7 @@ export default function LearnPage() {
                 )}
               </div>
 
-              <div className="fixed bottom-[72px] left-0 right-0 px-5 pb-2 bg-white dark:bg-[#0d0d0f] border-t border-gray-200 dark:border-white/[0.06] pt-3 z-40">
+              <div className="fixed bottom-[85px] left-0 right-0 px-5 pb-3 bg-white dark:bg-[#0d0d0f] border-t border-gray-200 dark:border-white/[0.06] pt-3 z-40">
                 <div className="flex gap-2 max-w-lg mx-auto">
                   <input
                     type="text"
