@@ -1,13 +1,98 @@
-// Text to speech — reads a word aloud
-export function speakWord(text: string, lang: string = 'tl-PH'): void {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = lang
-    utterance.rate = 0.8
-    utterance.pitch = 1
-    window.speechSynthesis.speak(utterance)
+// Cache for Filipino voice
+let cachedFilipinoVoice: SpeechSynthesisVoice | null = null
+let voicesLoaded = false
+
+// Find the best Filipino/Tagalog voice available
+function getFilipinoVoice(): SpeechSynthesisVoice | null {
+  if (cachedFilipinoVoice) return cachedFilipinoVoice
+  
+  const voices = speechSynthesis.getVoices()
+  if (voices.length === 0) return null
+  
+  // Priority order for Filipino voices
+  const filipinoPatterns = [
+    /fil-PH/i,           // Filipino (Philippines)
+    /tl-PH/i,            // Tagalog (Philippines)
+    /Filipino/i,         // Any voice with "Filipino" in name
+    /Tagalog/i,          // Any voice with "Tagalog" in name
+    /Philippines/i,      // Any voice mentioning Philippines
+  ]
+  
+  for (const pattern of filipinoPatterns) {
+    const match = voices.find(v => 
+      pattern.test(v.lang) || pattern.test(v.name)
+    )
+    if (match) {
+      cachedFilipinoVoice = match
+      return match
+    }
   }
+  
+  // Fallback: Try to find any Asian voice that might sound closer
+  const asianVoice = voices.find(v => 
+    /id-ID|ms-MY|vi-VN/i.test(v.lang) // Indonesian, Malay, Vietnamese - similar phonetics
+  )
+  if (asianVoice) {
+    cachedFilipinoVoice = asianVoice
+    return asianVoice
+  }
+  
+  return null
+}
+
+// Initialize voices (they load asynchronously in some browsers)
+function initVoices(): Promise<void> {
+  return new Promise((resolve) => {
+    if (voicesLoaded || speechSynthesis.getVoices().length > 0) {
+      voicesLoaded = true
+      resolve()
+      return
+    }
+    
+    speechSynthesis.onvoiceschanged = () => {
+      voicesLoaded = true
+      resolve()
+    }
+    
+    // Timeout fallback
+    setTimeout(() => {
+      voicesLoaded = true
+      resolve()
+    }, 1000)
+  })
+}
+
+// Text to speech — reads a word aloud with Filipino accent
+export async function speakWord(text: string, lang: string = 'fil-PH'): Promise<void> {
+  if (!('speechSynthesis' in window)) return
+  
+  // Wait for voices to load
+  await initVoices()
+  
+  window.speechSynthesis.cancel()
+  
+  const utterance = new SpeechSynthesisUtterance(text)
+  
+  // Try to get Filipino voice
+  const filipinoVoice = getFilipinoVoice()
+  
+  if (filipinoVoice) {
+    utterance.voice = filipinoVoice
+    utterance.lang = filipinoVoice.lang
+  } else {
+    // Fallback to Filipino language code
+    utterance.lang = lang
+  }
+  
+  // Adjust for more natural Filipino pronunciation
+  // Slower rate helps with syllable-timed languages like Filipino
+  utterance.rate = 0.85
+  // Slightly higher pitch is more natural for Filipino
+  utterance.pitch = 1.05
+  // Full volume
+  utterance.volume = 1
+  
+  speechSynthesis.speak(utterance)
 }
 
 // Start recording with Web Speech API (returns transcript)
