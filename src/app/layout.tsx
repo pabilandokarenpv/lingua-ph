@@ -3,6 +3,7 @@ import './globals.css'
 import { ThemeProvider } from '@/lib/theme'
 import { OfflineBanner } from '@/components/OfflineBanner'
 import { BottomNav } from '@/components/BottomNav'
+import { VoicePreloader } from '@/components/VoicePreloader'
 
 export const metadata: Metadata = {
   title: 'Lingua PH — Philippine Indigenous Languages',
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider>
+          <VoicePreloader />
           <OfflineBanner />
           <main className="max-w-[430px] mx-auto pb-20">
             {children}
