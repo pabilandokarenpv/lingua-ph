@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-gray-900 font-sans dark:bg-black dark:text-white;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-brand text-white;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+  [data-theme="dark"] .glass {
+    background: rgba(28, 28, 30, 0.72);
+  }
+
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+  }
+  [data-theme="dark"] .glass-nav {
+    background: rgba(13, 13, 15, 0.85);
+  }
+
+  .card {
+    @apply bg-gray-50 rounded-2xl border border-gray-200 dark:bg-surface-2 dark:border-white/[0.06];
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card:hover {
+    @apply border-gray-300 dark:border-white/[0.12];
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+  [data-theme="dark"] .card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .input-field {
+    @apply w-full bg-gray-100 border border-gray-200 rounded-xl py-3.5 px-4 text-gray-900 text-[15px] transition-all duration-200
+      dark:bg-surface-2 dark:border-white/[0.08] dark:text-white;
+  }
+
+  .input-field::placeholder {
+    @apply text-gray-400 dark:text-white/30;
+  }
+
+  .input-field:focus {
+    @apply outline-none border-brand/60;
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+  }
+
+  .btn-primary {
+    @apply px-6 py-3.5 rounded-xl font-semibold text-[15px] text-white transition-all duration-200;
+    background: linear-gradient(180deg, #0A84FF 0%, #0071E3 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.25);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-40 cursor-not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3.5 rounded-xl font-medium text-[15px] text-gray-600 bg-gray-100 border border-gray-200 transition-all duration-200
+      dark:text-white/80 dark:bg-white/[0.06] dark:border-white/[0.08];
+  }
+
+  .btn-secondary:hover {
+    @apply bg-gray-200 border-gray-300 text-gray-900
+      dark:bg-white/[0.10] dark:border-white/[0.14] dark:text-white;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200;
+  }
+
+  .chip-active {
+    @apply bg-brand text-white;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  }
+
+  .chip-inactive {
+    @apply bg-gray-100 text-gray-500 border border-gray-200
+      dark:bg-white/[0.06] dark:text-white/50 dark:border-white/[0.06];
+  }
+
+  .chip-inactive:hover {
+    @apply bg-gray-200 text-gray-700 border-gray-300
+      dark:bg-white/[0.10] dark:text-white/70 dark:border-white/[0.10];
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
