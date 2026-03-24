@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Search, Plus, TrendingUp, Users, BookOpen, MapPin, ChevronRight, MoreHorizontal, Heart, Activity } from 'lucide-react'
 import Link from 'next/link'
@@ -17,6 +18,7 @@ const statusColors: Record<string, { dot: string; bg: string; text: string }> = 
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [languages, setLanguages] = useState<Language[]>([])
   const [filtered, setFiltered] = useState<Language[]>([])
   const [search, setSearch] = useState('')
@@ -25,6 +27,10 @@ export default function HomePage() {
   const [showModal, setShowModal] = useState(false)
   const [showFloatingMenu, setShowFloatingMenu] = useState(false)
   const [form, setForm] = useState({ name: '', region: '', province: '' })
+
+  useEffect(() => {
+    router.replace('/contribute')
+  }, [router])
 
   useEffect(() => {
     (async () => {

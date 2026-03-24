@@ -70,7 +70,7 @@ function ContributePageContent() {
   const searchParams = useSearchParams()
   const preselectedLang = searchParams.get('lang')
 
-  const [activeTab, setActiveTab] = useState<'text' | 'voice' | 'chat'>('text')
+  const [activeTab, setActiveTab] = useState<'text' | 'voice' | 'chat'>('voice')
   const [languages, setLanguages] = useState<Language[]>([])
   const [selectedLanguage, setSelectedLanguage] = useState<string>(preselectedLang ?? '')
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -436,20 +436,6 @@ function ContributePageContent() {
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === 'text'}
-          onClick={() => setActiveTab('text')}
-          className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 text-[12px] font-medium transition-colors ${
-            activeTab === 'text'
-              ? 'bg-brand text-white shadow-md'
-              : 'text-gray-500 dark:text-white/45 hover:text-gray-700 dark:hover:text-white/70'
-          }`}
-        >
-          <PenLine className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          Text
-        </button>
-        <button
-          type="button"
-          role="tab"
           aria-selected={activeTab === 'voice'}
           onClick={() => setActiveTab('voice')}
           className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 text-[12px] font-medium transition-colors ${
@@ -460,6 +446,20 @@ function ContributePageContent() {
         >
           <Mic className="h-3.5 w-3.5 shrink-0" aria-hidden />
           Voice
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'text'}
+          onClick={() => setActiveTab('text')}
+          className={`flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 px-1.5 text-[12px] font-medium transition-colors ${
+            activeTab === 'text'
+              ? 'bg-brand text-white shadow-md'
+              : 'text-gray-500 dark:text-white/45 hover:text-gray-700 dark:hover:text-white/70'
+          }`}
+        >
+          <PenLine className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          Text
         </button>
         <button
           type="button"
